@@ -1,2 +1,2 @@
-# Data-Science-Coursera-
+# Data-Science-Coursera
 Data Science Specialisation-JHU
