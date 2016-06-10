@@ -21,6 +21,6 @@ Creates a second, independent tidy data set with the average of each variable fo
 Good luck!
 
 ## Explanation of contents
-#### run_analysis.R: downloads all the required files to complete this assignment and creates a big file mean_and_std.csv and a small file tidy_dataset.csv (both are stored in /results)
+1)- UCI-Run Analysis.R: downloads all the required files to complete this assignment and creates a big file mean_and_std.csv and a small file tidy_dataset.csv (both are stored in /results)
 
-#### CodeBook.md: it is a brief explanation of what run_analysis.R does
+2)- CodeBook.md: it is a brief explanation of what run_analysis.R does
