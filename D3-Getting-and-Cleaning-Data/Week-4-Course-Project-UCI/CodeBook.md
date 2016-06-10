@@ -16,7 +16,6 @@
 2.2-Rename columns names
 2.3- Merge data into one dataset - MergeAll
 
-
 3-Extracts only the measurements on the mean and standard deviation for each measurement
 3.1-Read column names
 3.2- Rename dataset into required ID, mean and std
