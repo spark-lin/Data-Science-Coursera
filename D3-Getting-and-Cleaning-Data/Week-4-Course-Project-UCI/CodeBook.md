@@ -9,7 +9,7 @@
 2-Merging the trainning and the test sets to create one dataset
 2.1- Read files 
 2.1.1-Read the training tables (load X_train.txt, y_train.txt, subject_train.txt)
-# 2.1.2-Read testing tables (load X_test.txt, y_test.txt, subject_test.txt)
+2.1.2-Read testing tables (load X_test.txt, y_test.txt, subject_test.txt)
 2.1.3-Read the features (load features.txt)
 2.1.4-Read activity labels
 
