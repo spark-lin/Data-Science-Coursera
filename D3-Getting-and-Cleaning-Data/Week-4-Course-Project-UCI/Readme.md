@@ -23,4 +23,7 @@ Good luck!
 ## Explanation of contents
 1)- UCI-Run Analysis.R: downloads all the required files to complete this assignment and creates a big file mean_and_std.csv and a small file tidy_dataset.csv (both are stored in /results)
 
-2)- CodeBook.md: it is a brief explanation of what run_analysis.R does
+2)- CodeBook.md: it is a brief explanation of what UCI-Run analysis.R does
+
+3)- AggreTidyData.csv
+4)- TidyData.csv
