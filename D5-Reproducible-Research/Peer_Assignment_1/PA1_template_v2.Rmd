@@ -35,7 +35,7 @@ hist(TotalSteps,breaks=20,
      col = "steelblue")
 ```
 
-![](~/Desktop/Coursera/D5_Reproducible Research/Week 2/Project_01/Rplot-01) 
+![](Data-Science-Coursera/D5-Reproducible-Research/Peer_Assignment_1/Rplot-01.png) 
 
 ### 2.2- Mean of Total number of steps taken per day
 
