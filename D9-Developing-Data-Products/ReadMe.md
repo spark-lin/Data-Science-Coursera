@@ -12,7 +12,7 @@ The goal of this course is to use R and shiny to build an interactive data produ
 
 ## Spark-Lin Word Cloud Shiny App
 
-This simpe Word Cloud Generator is inspired by PirateGrunt and Fereshteh Karimeddini.
+This simpe Word Cloud Generator is inspired by the blog post by PirateGrunt and work of Fereshteh Karimeddini.
 
 1-Source code and download books txt-format files are available on [Github](https://github.com/spark-lin/Data-Science-Coursera/tree/master/D9-Developing-Data-Products).
 
@@ -25,5 +25,9 @@ This simpe Word Cloud Generator is inspired by PirateGrunt and Fereshteh Karimed
   - [The Adventures of Sherlock Holmes, by Arthur Conan Doyle](http://www.gutenberg.org/cache/epub/1661/pg1661.txt)
   
 3-If you want find out more info about Shiny, please go to [Shiny](https://shiny.rstudio.com/) web page.
+
+I would continue to update this app and add more features on it.
+
+Thank you for your time. 
   
   
