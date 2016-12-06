@@ -1,0 +1,221 @@
+---
+title: "Pratical Machine Learning-Project"
+author: "Spark-lin"
+date: "12/3/2016"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+### Pratical Machine Learning-Final Project
+
+#### 1-Project Introduction
+###### 1.1-Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+###### 1.2-Data Source
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+###### 1.3-Goal of Project
+The goal of this course project is to predict the manner in which they did the exercise. This is the “classe” variable in the training set. You may use any of the other variables to predict with. 
+
+You should create a report describing how you built your model, how you used cross validation, 
+what you think the expected out of sample error is, and rationalize why you made the choices you did.
+You will also use your prediction model to predict 20 different test cases.
+
+```{r}
+# Load required packages
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(rattle)
+
+library(RColorBrewer)
+library(randomForest)
+library(knitr)
+```
+
+#### 2-Getting and cleaning data
+```{r}
+TrainUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+TestUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+# 2.1-Load and read data
+TrainData <- read.csv(url(TrainUrl), na.strings = 'NA')
+TestData <- read.csv(url(TestUrl), na.strings = 'NA')
+
+# 2.2-Create a Data partition with the Trainset (only the training data)
+inTrain <- createDataPartition(TrainData$classe, p = 0.7, list = FALSE)
+TrainSet <- TrainData[inTrain, ]
+TestSet  <- TrainData[-inTrain, ] # don't put wrongly TestData
+dim(TrainSet)
+dim(TestSet)
+```
+# Cleaning data
+```{r}
+# Viewing training data set 
+names(TrainSet)
+head(TrainSet)
+```
+
+We observe that there are variables which are irrelavant for our analysis. Such as "X" and "user_variable" other NA value,  Near Zero Variance (NZV) variables and ID variables
+```{r}
+TrainSet <- TrainSet[, -(1:2)]
+TestSet <- TestSet[, -(1:2)]
+
+# 2.3-Remove Near Zero variable Variance
+NZV <- nearZeroVar(TrainSet)
+TrainSet <- TrainSet[, -NZV]
+TestSet <- TestSet[, -NZV]
+dim(TrainSet)
+dim(TestSet )
+
+# 2.4-Remove variable that have a possibility more than 70& of value of "NA"
+
+NA_value <- sapply(TrainSet, function(x) mean(is.na(x)))
+TrainSet <- TrainSet[, (NA_value  > 0.7) == FALSE]
+TestSet  <- TestSet[, (NA_value  > 0.7) == FALSE]
+dim(TrainSet)
+dim(TestSet)
+
+# 2.5-Remove the ID variables
+TrainSet <- TrainSet[, -(1:5)]
+TestSet  <- TestSet[, -(1:5)]
+dim(TrainSet)
+dim(TestSet)
+
+```
+
+After cleaning the irrelevant variables, we manage to reduce the number of variables for analysis to 52
+
+#### 3-Correaltion among the variables
+Let's run a correlation analysis among the variables to see if some of varaibles are highly correlated to each other.
+```{r}
+library(corrplot)
+corelationMatrix <- cor(TrainSet[, -52])
+corrplot(corelationMatrix, order = "hclust", method = "color", type = "lower", tl.cex = 0.7, tl.col = rgb(0, 0, 0))
+
+# order = "FPC", refers to  the first principal component order
+# order = "hclust", refers to hierarchical clustering order.
+# type should only be one of “full”, “lower”, “upper” value.
+```
+
+#### 4-Prediction Model
+In this part, we will use 3 prediction model to simulate the regression in the TrainSet,contrast related results and accuracy level, then select the highest accuracy methode for the quiz prediction.
+
+The prediction methode used are:
+- Decision Trees
+- Random Forests
+- Generalized Boosted Regression
+
+###### 4.1- Decision Trees Methode
+```{r}
+set.seed(12000)
+modelFit_DecisionTree <- rpart(classe ~ ., data = TrainSet, method = "class")
+fancyRpartPlot(modelFit_DecisionTree)
+```
+```{r}
+# Decision Tree Prediction on Test dataset
+Pred_DecisionTree  <- predict(modelFit_DecisionTree, newdata = TestSet, type = "class")
+ConfusionMatrix_DecisionTree <- confusionMatrix(Pred_DecisionTree, TestSet$classe)
+ConfusionMatrix_DecisionTree
+```
+```{r}
+# Plot Decision Tree Confusion Matrix
+plot(ConfusionMatrix_DecisionTree$table, col = ConfusionMatrix_DecisionTree$byClass, 
+     main = paste("Decision Tree Confusion Matrix: Accuracy =",
+                  round(ConfusionMatrix_DecisionTree$overall['Accuracy'], 4)))
+```
+###### 4.2- Random Forests Methode
+```{r}
+# Random Forests Prediction on Test dataset
+set.seed(12000)
+ModelFit_RanForest <- randomForest(classe~., data = TrainSet)
+Pred_RanForest <- predict(ModelFit_RanForest, TestSet, type = "class")
+ConfusionMatrix_RanForest <- confusionMatrix(Pred_RanForest, TestSet$classe)
+ConfusionMatrix_RanForest
+
+```
+```{r}
+# Plot ModelFit Random Forest
+plot(ModelFit_RanForest)
+
+# Plot Random Forest Confusion Matrix
+plot(ConfusionMatrix_RanForest$table, col = ConfusionMatrix_RanForest$byClass, 
+     main = paste("Random Forest Confusion Matrix: Accuracy =",      
+                   round(ConfusionMatrix_RanForest$overall['Accuracy'], 4)))
+```
+###### 4.3-Generalized Boosted Regression Methode (GBM)
+```{r}
+ModelFit_Control <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
+ModelFit_GBM <- train(classe ~ ., data = TrainSet, 
+                      method = "gbm", 
+                      trControl = ModelFit_Control, 
+                      verbose = FALSE)
+GBM_FinalModel <- ModelFit_GBM$finalModel
+GBM_FinalModel
+
+```
+
+```{r}
+# Generalized Boosted Regression Methode (GBM) Prediction on Test dataset
+Pred_GBM <- predict(ModelFit_GBM, newdata = TestSet)
+ConfusionMatrix_GBM <- confusionMatrix(Pred_GBM, TestSet$classe)
+ConfusionMatrix_GBM
+```
+```{r}
+# Plot Generalized Boosted Regression Methode (GBM) Confusion Matrix
+plot(ConfusionMatrix_GBM$table, col = ConfusionMatrix_GBM$byClass,
+     main = paste("GBM Confusion Matrix: Accuracy =",
+                   round(ConfusionMatrix_GBM$overall['Accuracy'], 4)))
+```
+###### 4.4-Contrast the acuracy of the Three Prediction Methodes
+```{r}
+# Comparison of the Three Prediction Methodes Accuracy result 
+print(paste("Decision Tree Confusion Matrix: Accuracy =",
+                  round(ConfusionMatrix_DecisionTree$overall['Accuracy'], 4)))
+print(paste("Random Forest Confusion Matrix: Accuracy =",      
+                   round(ConfusionMatrix_RanForest$overall['Accuracy'], 4)))
+print(paste("GBM Confusion Matrix: Accuracy: Accuracy =",
+                   round(ConfusionMatrix_GBM$overall['Accuracy'], 4)))
+```
+As the we can see from the above Accuracy Comparison, the Random Forest model have the highest level of accuracy of 0.9949. The expected out of-sample error = 100% - 99.49% = 0.51%. 
+
+
+Therefore, we would choose the Random Forest model to precit  20 different test cases. 
+
+###### 5-Apply the the Random Forest model to precit  20 different test cases.(TestData)
+
+The 20 Quiz tested results are shown below:
+```{r, echo = FALSE}
+Pred_Test <- predict(ModelFit_RanForest, newdata = TestSet)
+
+```
+
+Show the Extract of the first 20 results (Total more than 8000 entries)
+```{r}
+# Show the Extract of the first 20 results (Total morethan 8000 entries)
+Pred_Test[1:20]
+```
+```{r, echo= FALSE, eval = FALSE}
+# Write the Quiz results into a txt file for submission
+PMLQuiz_write_files = function(x){
+  n = length(x)
+  for (i in 1:n) {
+        filename = paste0("problem_id_",i,".txt")
+        write.table(x[i],file = filename, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    }
+}
+```
+
+
